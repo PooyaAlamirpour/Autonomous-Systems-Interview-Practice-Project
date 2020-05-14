@@ -284,7 +284,24 @@ First, by pooling layers, some location information of objects is lost. Besides,
 Backpropagation is the strategy to update the parameters of the networks during training. It makes use of chain rule for calculating derivatives of parameters in each layer, given the ground truth labels. 
 
 
-### [Code] Given a dataset of your choosing, code a neural network in a deep learning library of your choice to train a model to do some type of inference over the data. Include any pre-processing steps. Explain why you chose the kind of conclusion you did, as well as what you could apply your trained model to do.
+### What features in the data did the model think are most important? For any single prediction from a model, how did each feature in the data affect that particular prediction?
+
+Recently I was working on a self-defined project in deep learning, and during working on it, I had a question that how can I determine which feature is important and has more effect? Mainly, For any single prediction from a model, how did each feature in the data affect that particular prediction? I have realized that answering this question is a concept key that is named feature importance. There are multiple ways to measure feature importance. Some approaches answer subtly different versions of the question above. Other approaches have documented shortcomings. Finally, I found a technique that is named permutation importance. It is really amazing solution for answering the above question. Permutation importance uses models differently than anything you've seen so far, and many people find it confusing at first. So we'll start with an example to make it more concrete. Consider data with the following format:
+
+![alt text](./table-1.png)
+
+We want to predict a person's height when they become 20 years old, using data that is available at age 10. Our data includes useful features (height at age 10), features with little predictive power (socks owned), as well as some other features we won't focus on in this explanation. Permutation importance is calculated after a model has been fitted. So we won't change the model or change what predictions we'd get for a given value of height, sock-count, etc. Instead we will ask the following question: If I randomly shuffle a single column of the validation data, leaving the target and all other columns in place, how would that affect the accuracy of predictions in that now-shuffled data?
+
+![alt text](./table-2.png)
+
+Randomly re-ordering a single column should cause less accurate predictions, since the resulting data no longer corresponds to anything observed in the real world. Model accuracy especially suffers if we shuffle a column that the model relied on heavily for predictions. In this case, shuffling height at age 10 would cause terrible predictions. If we shuffled socks owned instead, the resulting predictions wouldn't suffer nearly as much.
+
+With this insight, the process is as follows:
+
+Get a trained model.
+Shuffle the values in a single column, make predictions using the resulting dataset. Use these predictions and the true target values to calculate how much the loss function suffered from shuffling. That performance deterioration measures the importance of the variable you just shuffled.
+Return the data to the original order (undoing the shuffle from step 2). Now repeat step 2 with the next column in the dataset, until you have calculated the importance of each column.
+
 
 
 
