@@ -65,7 +65,7 @@ I have not deployed one. In my opinion, the first thing is that C++ API or other
 These two questions I can answer together. I read in-depth learning research papers of ResNet recently. Here is the critical point of this architecture. 
 
 From [here](https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py):
-```
+```python
 class BasicBlock(nn.Module):
 
     expansion = 1
@@ -154,7 +154,7 @@ The critical insight of the Inception neural network is that the system determin
 
 From [here](https://github.com/pytorch/vision/blob/master/torchvision/models/inception.py):
 
-``` 
+```python
 class InceptionA(nn.Module):
 
     def __init__(self, in_channels, pool_features):
@@ -202,7 +202,7 @@ There are two kinds of MobileNet, V1, and V2. Both of these two versions of Mobi
 From [here](https://github.com/tonylins/pytorch-mobilenet-v2):
 
 
-```
+```python
 
 class depthwise_separable_conv(nn.Module):
     def __init__(self, nin, nout):
