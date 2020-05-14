@@ -302,9 +302,37 @@ Get a trained model.
 Shuffle the values in a single column, make predictions using the resulting dataset. Use these predictions and the true target values to calculate how much the loss function suffered from shuffling. That performance deterioration measures the importance of the variable you just shuffled.
 Return the data to the original order (undoing the shuffle from step 2). Now repeat step 2 with the next column in the dataset, until you have calculated the importance of each column.
 
+My example will use a model that predicts whether a soccer/football team will have the "Man of the Game" winner based on the team's statistics. The "Man of the Game" award is given to the best player in the game. Model-building isn't our current focus, so the cell below loads the data and builds a rudimentary model.
 
+```python
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 
+data = pd.read_csv('../input/fifa-2018-match-statistics/FIFA 2018 Statistics.csv')
+y = (data['Man of the Match'] == "Yes")  # Convert from string "Yes"/"No" to binary
+feature_names = [i for i in data.columns if data[i].dtype in [np.int64]]
+X = data[feature_names]
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=1)
+my_model = RandomForestClassifier(n_estimators=100, random_state=0).fit(train_X, train_y)
 
+```
+
+Here is how to calculate and show importances with the `eli5` library:
+
+```python
+import eli5
+from eli5.sklearn import PermutationImportance
+
+perm = PermutationImportance(my_model, random_state=1).fit(val_X, val_y)
+eli5.show_weights(perm, feature_names = val_X.columns.tolist())
+```
+
+![alt text](./table-3.png)
+
+The values towards the top are the most important features, and those towards the bottom matter least. The first number in each row shows how much model performance decreased with a random shuffling (in this case, using "accuracy" as the performance metric). Like most things in data science, there is some randomness to the exact performance change from a shuffling a column. We measure the amount of randomness in our permutation importance calculation by repeating the process with multiple shuffles. The number after the ± measures how performance varied from one-reshuffling to the next. You'll occasionally see negative values for permutation importances. In those cases, the predictions on the shuffled (or noisy) data happened to be more accurate than the real data. This happens when the feature didn't matter (should have had an importance close to 0), but random chance caused the predictions on shuffled data to be more accurate. This is more common with small datasets, like the one in this example, because there is more room for luck/chance.
+In our example, the most important feature was Goals scored. That seems sensible. Soccer fans may have some intuition about whether the orderings of other variables are surprising or not.
 
 
 
